@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "gymmate-8b43d": {
+      "hosting": {
+        "gym-mate": [
+          "gymmate-8b43d"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "gymmate-8b43d"
+  }
+}

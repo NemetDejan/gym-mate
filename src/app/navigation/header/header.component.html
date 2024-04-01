@@ -1,0 +1,26 @@
+<mat-toolbar color="primary">
+  <div class="navigation-button">
+    <button mat-icon-button (click)="onToggleSidenav()">
+      <mat-icon>menu</mat-icon>
+    </button>
+  </div>
+  <!--      TODO: add some logo and style this a bit-->
+  <div><a routerLink="/">LOGO</a></div>
+  <ul class="nav-links">
+    @if (!isAuth) {
+      <li>
+        <a routerLink="/signup">Signup</a>
+      </li>
+      <li>
+        <a routerLink="/login">Login</a>
+      </li>
+    } @else {
+      <li>
+        <a routerLink="/training">Training</a>
+      </li>
+      <li>
+        <a (click)="onLogout()">Logout</a>
+      </li>
+    }
+  </ul>
+</mat-toolbar>

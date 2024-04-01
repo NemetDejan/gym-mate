@@ -1,0 +1,23 @@
+mat-sidenav,
+mat-sidenav-container,
+mat-sidenav-content {
+  height: 100%;
+}
+
+a {
+  text-decoration: none;
+}
+
+.navigation-button {
+  display: none;
+
+  @media (max-width: 600px) {
+    display: block;
+  }
+}
+
+
+mat-sidenav {
+  min-width: 17rem;
+}
+

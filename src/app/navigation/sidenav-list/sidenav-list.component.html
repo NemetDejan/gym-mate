@@ -1,0 +1,29 @@
+<mat-nav-list>
+  @if (!isAuth) {
+    <mat-list-item>
+      <a matListItemTitle routerLink="/signup" (click)="onSidenavClose()">
+        <mat-icon matListItemIcon>account_box</mat-icon>
+        <span class="sidenav-text">Signup</span>
+      </a>
+    </mat-list-item>
+    <mat-list-item>
+      <a matListItemTitle routerLink="/login" (click)="onSidenavClose()">
+        <mat-icon matListItemIcon>login</mat-icon>
+        <span class="sidenav-text">Login</span>
+      </a>
+    </mat-list-item>
+  } @else {
+    <mat-list-item>
+      <a matListItemTitle routerLink="/training" (click)="onSidenavClose()">
+        <mat-icon matListItemIcon>fitness_center</mat-icon>
+        <span class="sidenav-text">Training</span>
+      </a>
+    </mat-list-item>
+    <mat-list-item>
+      <button mat-icon-button (click)="onSidenavClose(); onLogout()">
+        <mat-icon>eject</mat-icon>
+        <span class="sidenav-text">Logout</span>
+      </button>
+    </mat-list-item>
+  }
+</mat-nav-list>
