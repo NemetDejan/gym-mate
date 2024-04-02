@@ -3,10 +3,13 @@ import {MatCard, MatCardActions, MatCardContent, MatCardTitle} from "@angular/ma
 import {MatButton} from "@angular/material/button";
 import {MatFormField} from "@angular/material/form-field";
 import {MatOption, MatSelect} from "@angular/material/select";
-import {TrainingService} from "../training.service";
-import {ExerciseModel} from "../exercise.model";
 import { FormsModule, NgForm } from "@angular/forms";
 import { Subscription } from "rxjs";
+
+import {ExerciseModel} from "../exercise.model";
+import {TrainingService} from "../training.service";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
+import { UiService } from "../../shared/ui.service";
 
 @Component({
   selector: 'app-new-training',
@@ -20,24 +23,35 @@ import { Subscription } from "rxjs";
     MatFormField,
     MatSelect,
     MatOption,
-    FormsModule
+    FormsModule,
+    MatProgressSpinner
   ],
   templateUrl: './new-training.component.html',
   styleUrl: './new-training.component.scss'
 })
 export class NewTrainingComponent implements OnInit, OnDestroy {
   exercises: ExerciseModel[];
-  exercisesSubscription: Subscription;
+  private newTrainingSubs: Subscription[] = [];
+
+  isLoading: boolean = true;
 
   constructor(
-    private trainingService: TrainingService
+    private trainingService: TrainingService,
+    private uiService: UiService
   ) {
   }
 
   ngOnInit() {
-    this.exercisesSubscription = this.trainingService.exercisesChanged.subscribe(exercises => {
+    this.newTrainingSubs.push(this.uiService.loadingStateChanged.subscribe(isLoading => {
+      this.isLoading = isLoading;
+    }));
+    this.newTrainingSubs.push(this.trainingService.exercisesChanged.subscribe(exercises => {
       this.exercises = exercises;
-    });
+    }));
+    this.fetchExercises();
+  }
+
+  fetchExercises() {
     this.trainingService.getAvailableExercises();
   }
 
@@ -46,6 +60,8 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.exercisesSubscription.unsubscribe();
+    if (this.newTrainingSubs) {
+      this.newTrainingSubs.forEach((sub: Subscription) => sub.unsubscribe());
+    }
   }
 }

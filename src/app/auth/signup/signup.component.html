@@ -32,9 +32,9 @@
         #pwInput="ngModel"
       >
       <mat-hint align="end">{{ pwInput.value?.length }} / 6</mat-hint>
-<!--      @if (pwInput.hasError('required')) {-->
-        <mat-error>Has to be at least 6 chars long</mat-error>
-<!--      }-->
+      <!--      @if (pwInput.hasError('required')) {-->
+      <mat-error>Has to be at least 6 chars long</mat-error>
+      <!--      }-->
     </mat-form-field>
     <mat-form-field>
       <mat-label>Enter your birthday</mat-label>
@@ -52,6 +52,10 @@
     <mat-checkbox ngModel name="toc" required color="primary">
       Agree to Terms and Conditions.
     </mat-checkbox>
-    <button mat-raised-button color="primary" [disabled]="signupForm.invalid">Submit</button>
+    @if (!isLoading) {
+      <button mat-raised-button color="primary" [disabled]="signupForm.invalid">Submit</button>
+    } @else {
+      <mat-spinner></mat-spinner>
+    }
   </form>
 </section>
