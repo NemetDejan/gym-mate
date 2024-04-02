@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {RouterLink, RouterOutlet} from '@angular/router';
 import {MatSidenav, MatSidenavContainer, MatSidenavContent} from "@angular/material/sidenav";
 import {MatToolbar} from "@angular/material/toolbar";
@@ -7,6 +7,7 @@ import {MatIcon} from "@angular/material/icon";
 import {MatListItem, MatListItemIcon, MatListItemTitle, MatNavList} from "@angular/material/list";
 import {SidenavListComponent} from "./navigation/sidenav-list/sidenav-list.component";
 import {HeaderComponent} from "./navigation/header/header.component";
+import { AuthService } from "./auth/auth.service";
 
 @Component({
   selector: 'app-root',
@@ -30,8 +31,14 @@ import {HeaderComponent} from "./navigation/header/header.component";
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
-  openSidenav: boolean = false;
+export class AppComponent implements OnInit {
 
-  title = 'gym-mate';
+  constructor(
+    private authService: AuthService
+  ) {
+  }
+
+  ngOnInit() {
+    this.authService.initAuthListener();
+  }
 }

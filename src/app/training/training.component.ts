@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {NewTrainingComponent} from "./new-training/new-training.component";
 import {PastTrainingaComponent} from "./past-traininga/past-traininga.component";
@@ -19,7 +19,7 @@ import {TrainingService} from "./training.service";
   templateUrl: './training.component.html',
   styleUrl: './training.component.scss'
 })
-export class TrainingComponent implements OnInit{
+export class TrainingComponent implements OnInit, OnDestroy {
   ongoingTraining: boolean = false;
   exerciseSubscription: Subscription;
 
@@ -29,11 +29,13 @@ export class TrainingComponent implements OnInit{
   ngOnInit() {
     this.exerciseSubscription = this.trainingService.exerciseChanged.subscribe(
       exercise => {
-        if (exercise) {
-          this.ongoingTraining = true;
-        } else {
-          this.ongoingTraining = false;
-        }
+        this.ongoingTraining = !!exercise;
       });
+  }
+
+  ngOnDestroy() {
+    if (this.exerciseSubscription) {
+      this.exerciseSubscription.unsubscribe();
+    }
   }
 }
