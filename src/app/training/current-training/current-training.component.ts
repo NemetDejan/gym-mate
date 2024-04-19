@@ -2,8 +2,13 @@ import {Component, OnInit} from '@angular/core';
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
 import {MatButton} from "@angular/material/button";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { take } from "rxjs";
+import { Store } from "@ngrx/store";
+
 import {StopTrainingComponent} from "./stop-training.component";
 import { TrainingService } from "../training.service";
+import * as fromTrainingReducer from '../training.reducer';
+import { ExerciseModel } from "../exercise.model";
 
 @Component({
   selector: 'app-current-training',
@@ -21,7 +26,8 @@ export class CurrentTrainingComponent implements OnInit {
 
   constructor(
     private dialog: MatDialog,
-    private trainingService: TrainingService
+    private trainingService: TrainingService,
+    private store: Store<fromTrainingReducer.State>
     ) {
   }
 
@@ -30,16 +36,18 @@ export class CurrentTrainingComponent implements OnInit {
   }
 
   startOrResumeTimer() {
-    // TODO: fiddle with this in order to accommodate more exercises, perhaps replace with something else...
-    // 20sec to finish the exercise
-    const step = this.trainingService.getRunningExercise().duration / 100 * 1000;
-    this.timer = setInterval(() => {
-      this.progress = this.progress + 1;
-      if (this.progress >= 100) {
-        this.trainingService.completeExercise();
-        clearInterval(this.timer);
-      }
-    }, step)
+    this.store.select(fromTrainingReducer.getActiveTraining).pipe(take(1)).subscribe((exercise: ExerciseModel) => {
+      // TODO: fiddle with this in order to accommodate more exercises, perhaps replace with something else...
+      // 20sec to finish the exercise
+      const step = (exercise.duration / 100) * 1000;
+      this.timer = setInterval(() => {
+        this.progress = this.progress + 1;
+        if (this.progress >= 100) {
+          this.trainingService.completeExercise();
+          clearInterval(this.timer);
+        }
+      }, step)
+    });
   }
 
   onStop() {

@@ -1,14 +1,17 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import {MatError, MatFormField, MatHint, MatLabel, MatSuffix} from "@angular/material/form-field";
-import {MatInput} from "@angular/material/input";
-import {MatButton} from "@angular/material/button";
-import {FormsModule, NgForm} from "@angular/forms";
-import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from "@angular/material/datepicker";
-import {MatCheckbox} from "@angular/material/checkbox";
-import {AuthService} from "../auth.service";
-import { Subscription } from "rxjs";
-import { UiService } from "../../shared/ui.service";
+import { Component, OnInit } from '@angular/core';
+import { FormsModule, NgForm } from "@angular/forms";
+import { MatError, MatFormField, MatHint, MatLabel, MatSuffix } from "@angular/material/form-field";
+import { MatInput } from "@angular/material/input";
+import { MatButton } from "@angular/material/button";
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from "@angular/material/datepicker";
+import { MatCheckbox } from "@angular/material/checkbox";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
+import { Observable } from "rxjs";
+import { Store } from "@ngrx/store";
+import { AsyncPipe } from "@angular/common";
+
+import { AuthService } from "../auth.service";
+import * as fromAppReducer from "../../app.reducer";
 
 @Component({
   selector: 'app-signup',
@@ -26,26 +29,24 @@ import { MatProgressSpinner } from "@angular/material/progress-spinner";
     MatLabel,
     MatSuffix,
     MatCheckbox,
-    MatProgressSpinner
+    MatProgressSpinner,
+    AsyncPipe
   ],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss'
 })
-export class SignupComponent implements OnInit, OnDestroy {
+export class SignupComponent implements OnInit {
   public maxDate: Date = new Date();
-  isLoading: boolean = false
-  private loadingSubs: Subscription;
+  isLoading$: Observable<boolean>;
 
   constructor(
     private authService: AuthService,
-    private uiService: UiService
+    private store: Store<fromAppReducer.State>
   ) {
   }
 
   ngOnInit() {
-    this.loadingSubs = this.uiService.loadingStateChanged.subscribe(isLoading => {
-      this.isLoading = isLoading;
-    })
+    this.isLoading$ = this.store.select(fromAppReducer.getIsLoading);
     this.maxDate.setFullYear(this.maxDate.getFullYear() - 18);
   }
 
@@ -56,9 +57,4 @@ export class SignupComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
-    if (this.loadingSubs) {
-      this.loadingSubs.unsubscribe();
-    }
-  }
 }

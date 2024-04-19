@@ -7,7 +7,7 @@
   <!--      TODO: add some logo and style this a bit-->
   <div><a routerLink="/">Gym Mate</a></div>
   <ul class="nav-links">
-    @if (!isAuth) {
+    @if (!(isAuth$ | async)) {
       <li>
         <a routerLink="/signup">Signup</a>
       </li>

@@ -52,7 +52,7 @@
     <mat-checkbox ngModel name="toc" required color="primary">
       Agree to Terms and Conditions.
     </mat-checkbox>
-    @if (!isLoading) {
+    @if (!(isLoading$ | async)) {
       <button mat-raised-button color="primary" [disabled]="signupForm.invalid">Submit</button>
     } @else {
       <mat-spinner></mat-spinner>
