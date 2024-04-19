@@ -1,12 +1,14 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { AuthService } from "../auth.service";
 import { MatError, MatFormField, MatHint } from "@angular/material/form-field";
 import { MatInput } from "@angular/material/input";
 import { MatButton } from "@angular/material/button";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
-import { UiService } from "../../shared/ui.service";
-import { Subscription } from "rxjs";
+import { Observable } from "rxjs";
+import { Store } from "@ngrx/store";
+import * as fromAppReducer from '../../app.reducer';
+import { AsyncPipe } from "@angular/common";
 
 @Component({
   selector: 'app-login',
@@ -18,12 +20,13 @@ import { Subscription } from "rxjs";
     ReactiveFormsModule,
     MatHint,
     MatError,
-    MatProgressSpinner
+    MatProgressSpinner,
+    AsyncPipe
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent implements OnInit, OnDestroy {
+export class LoginComponent implements OnInit {
   loginForm = this.formBuilder.group({
     email: ['', {
       validators: [Validators.required, Validators.email]
@@ -31,20 +34,17 @@ export class LoginComponent implements OnInit, OnDestroy {
     password: ['', { validators: [Validators.required] }]
   });
 
-  isLoading: boolean = false;
-  private loadingSubs: Subscription;
+  isLoading$: Observable<boolean>;
 
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
-    private uiService: UiService
+    private store: Store<fromAppReducer.State>
   ) {
   }
 
   ngOnInit() {
-    this.loadingSubs = this.uiService.loadingStateChanged.subscribe(isLoading => {
-      this.isLoading = isLoading;
-    })
+    this.isLoading$ = this.store.select(fromAppReducer.getIsLoading);
   }
 
   onSubmit() {
@@ -52,11 +52,5 @@ export class LoginComponent implements OnInit, OnDestroy {
       email: this.loginForm.value.email as string,
       password: this.loginForm.value.password as string
     });
-  }
-
-  ngOnDestroy() {
-    if (this.loadingSubs) {
-      this.loadingSubs.unsubscribe();
-    }
   }
 }

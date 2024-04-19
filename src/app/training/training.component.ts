@@ -1,10 +1,14 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {NewTrainingComponent} from "./new-training/new-training.component";
-import {PastTrainingaComponent} from "./past-traininga/past-traininga.component";
+import {PastTrainingComponent} from "./past-traininga/past-training.component";
 import {CurrentTrainingComponent} from "./current-training/current-training.component";
-import {Subscription} from "rxjs";
+import { Store } from "@ngrx/store";
+
 import {TrainingService} from "./training.service";
+import * as fromTrainingReducer from './training.reducer'
+import { Observable } from "rxjs";
+import { AsyncPipe } from "@angular/common";
 
 @Component({
   selector: 'app-training',
@@ -13,29 +17,23 @@ import {TrainingService} from "./training.service";
     MatTabGroup,
     MatTab,
     NewTrainingComponent,
-    PastTrainingaComponent,
-    CurrentTrainingComponent
+    PastTrainingComponent,
+    CurrentTrainingComponent,
+    AsyncPipe
   ],
   templateUrl: './training.component.html',
   styleUrl: './training.component.scss'
 })
-export class TrainingComponent implements OnInit, OnDestroy {
-  ongoingTraining: boolean = false;
-  exerciseSubscription: Subscription;
+export class TrainingComponent implements OnInit {
+  ongoingTraining$: Observable<boolean>;
 
-  constructor(private trainingService: TrainingService) {
+  constructor(
+    private trainingService: TrainingService,
+    private store: Store
+  ) {
   }
 
   ngOnInit() {
-    this.exerciseSubscription = this.trainingService.exerciseChanged.subscribe(
-      exercise => {
-        this.ongoingTraining = !!exercise;
-      });
-  }
-
-  ngOnDestroy() {
-    if (this.exerciseSubscription) {
-      this.exerciseSubscription.unsubscribe();
-    }
+    this.ongoingTraining$ = this.store.select(fromTrainingReducer.getIsTrainingActive);
   }
 }

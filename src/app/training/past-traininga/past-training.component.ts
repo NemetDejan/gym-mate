@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import {
   MatCell,
   MatCellDef,
@@ -12,16 +12,18 @@ import {
   MatTable, MatTableDataSource
 } from "@angular/material/table";
 import { DatePipe, DecimalPipe } from "@angular/common";
-import { ExerciseModel } from "../exercise.model";
-import { TrainingService } from "../training.service";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
 import { MatFormField } from "@angular/material/form-field";
 import { MatInput } from "@angular/material/input";
 import { MatPaginator } from "@angular/material/paginator";
-import { Subscription } from "rxjs";
+import { Store } from "@ngrx/store";
+
+import { ExerciseModel } from "../exercise.model";
+import { TrainingService } from "../training.service";
+import * as fromTrainingReducer from '../training.reducer';
 
 @Component({
-  selector: 'app-past-traininga',
+  selector: 'app-past-training',
   standalone: true,
   imports: [
     MatTable,
@@ -42,23 +44,23 @@ import { Subscription } from "rxjs";
     MatInput,
     MatPaginator
   ],
-  templateUrl: './past-traininga.component.html',
-  styleUrl: './past-traininga.component.scss'
+  templateUrl: './past-training.component.html',
+  styleUrl: './past-training.component.scss'
 })
-export class PastTrainingaComponent implements OnInit, AfterViewInit, OnDestroy {
-  private pastTrainingsSubscription: Subscription;
-  dataSource = new MatTableDataSource<ExerciseModel>();
-  displayedColumns = ['date', 'name', 'duration', 'calories', 'state'];
+export class PastTrainingComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sortExercises: MatSort;
   @ViewChild(MatPaginator) exercisesPaginator: MatPaginator;
+  dataSource = new MatTableDataSource<ExerciseModel>();
+  displayedColumns = ['date', 'name', 'duration', 'calories', 'state'];
 
   constructor(
-    private trainingService: TrainingService
+    private trainingService: TrainingService,
+    private store: Store<fromTrainingReducer.State>
   ) {}
 
   ngOnInit() {
     this.trainingService.getCompletedOrCanceledExercises();
-    this.pastTrainingsSubscription = this.trainingService.finishedExercisesChanged.subscribe((exercises: ExerciseModel[]) => {
+    this.store.select(fromTrainingReducer.getFinishedExercises).subscribe((exercises: ExerciseModel[]) => {
       this.dataSource.data = exercises;
     });
   }
@@ -70,11 +72,5 @@ export class PastTrainingaComponent implements OnInit, AfterViewInit, OnDestroy 
 
   doFilter(event: Event) {
     this.dataSource.filter = (event.target as HTMLInputElement).value.trim().toLowerCase();
-  }
-
-  ngOnDestroy() {
-    if (this.pastTrainingsSubscription) {
-      this.pastTrainingsSubscription.unsubscribe();
-    }
   }
 }

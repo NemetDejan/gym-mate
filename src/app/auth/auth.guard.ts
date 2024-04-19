@@ -1,27 +1,22 @@
 import {
   ActivatedRouteSnapshot,
   CanActivateFn, CanMatchFn, Route,
-  Router,
   RouterStateSnapshot,
   UrlSegment
 } from "@angular/router";
 import { inject } from "@angular/core";
-import { AuthService } from "./auth.service";
+import { Store } from "@ngrx/store";
 
+import * as fromAppReducer from './auth.reducer';
+import { take } from "rxjs";
 
 export const authGuard: CanActivateFn = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
 ) => {
-  const authService: AuthService = inject(AuthService);
-  const router: Router = inject(Router);
+  const store: Store = inject(Store);
 
-  if (authService.isAuth()) {
-    return true;
-  } else {
-    router.navigate(['/login']);
-    return false;
-  }
+  return store.select(fromAppReducer.getIsAuthenticated).pipe(take(1));
 }
 
 // used mostly for lazy loaded components not to load the packages
@@ -29,13 +24,7 @@ export const canMatchAuthGuard: CanMatchFn = (
   route: Route,
   segments: UrlSegment[]
 ) => {
-  const authService: AuthService = inject(AuthService);
-  const router: Router = inject(Router);
+  const store: Store = inject(Store);
 
-  if (authService.isAuth()) {
-    return true;
-  } else {
-    router.navigate(['/login']);
-    return false;
-  }
+  return store.select(fromAppReducer.getIsAuthenticated).pipe(take(1));
 }
